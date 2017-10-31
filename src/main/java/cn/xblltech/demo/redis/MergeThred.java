@@ -23,9 +23,7 @@ public class MergeThred implements Runnable {
     @Override
     public synchronized void run() {
         try {
-            RandomAccessFile rFile = new RandomAccessFile(fileMessages.getName(), "rw");
-//            rFile.setLength(Integer.valueOf(fileMessages.getChunkSize()) * (fileMessages.getTotalChunks().intValue() - 1)
-//                    + ((byte[])next2).length);
+            File newFile = new File(fileMessages.getName());
             long size = 0;
             int i = 1;
             for (; i <= fileMessages.getTotalChunks(); i++) {
@@ -36,8 +34,7 @@ public class MergeThred implements Runnable {
                     while (iterator.hasNext()) {
                         Object next = iterator.next();
                         if (next instanceof byte[]) {
-                            rFile.seek(size);
-                            rFile.write((byte[])next);
+                            FileUtils.writeByteArrayToFile(newFile, (byte[]) next, true);
                             size += ((byte[]) next).length;
                             LOGGER.info("文件大小：" + size + ",每块数据大小:" + ((byte[]) next).length + ",文件块数:" + i);
                         }
@@ -46,7 +43,6 @@ public class MergeThred implements Runnable {
                     i--;
                 }
             }
-            rFile.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
