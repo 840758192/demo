@@ -10,15 +10,15 @@ import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MergeThred implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RedisReceiver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeThred.class);
     private FileMessage fileMessages;
     private RedisTemplate<String, Object> redisTemplate;
     public MergeThred(FileMessage fileMessages,RedisTemplate<String, Object> redisTemplate) {
         this.fileMessages = fileMessages;
         this.redisTemplate=redisTemplate;
-
     }
     @Override
     public synchronized void run() {
@@ -44,6 +44,7 @@ public class MergeThred implements Runnable {
                 }
             }
         } catch (Exception e) {
+            redisTemplate.delete(fileMessages.getIdentifier());
             e.printStackTrace();
         }
     }
